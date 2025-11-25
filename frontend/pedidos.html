@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pedidos | BK-Duoc</title>
+
+    <!-- TAILWIND CORRECTAMENTE CARGADO -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- CONFIGURACIÓN CORRECTA DE TAILWIND (NO EN <style>) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bk-primary': '#442200', /* Marrón oscuro BK */
+                        'bk-secondary': '#ffcc00', /* Amarillo BK */
+                        'bk-accent': '#ff5733', /* Rojo/Naranja */
+                        'bk-light': '#fff8ec',    /* Fondo claro */
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <!-- ICONOS -->
+    <link rel="stylesheet" 
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- TU CSS EXTRA -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body class="bg-bk-light text-bk-primary min-h-screen font-sans">
+    <header class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="logo">BK-DUOC</a>
+            <div class="nav-links">
+                <a href="productos.html">Productos</a>
+                <a href="combos.html">Combos</a>
+                <a href="pedidos.html">Pedidos</a>
+                <a href="clientes.html">Clientes</a>
+                <a href="empleados.html">Empleados</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+
+        <!-- HERO -->
+        <section class="hero-section text-center py-10 bg-white rounded-xl shadow-lg mb-8">
+            <h1 class="text-4xl font-extrabold text-bk-accent mb-2">Gestión de Pedidos</h1>
+            <p class="text-lg text-gray-700">
+                Creación y seguimiento de pedidos. Incluye validación de stock (BK-030) y descuento (BK-021).
+            </p>
+        </section>
+
+        <!-- FORMULARIO -->
+        <section class="bg-white p-8 rounded-xl shadow-2xl mb-12">
+            <h2 class="text-2xl font-bold text-bk-primary mb-6">
+                <span id="formTitle">Registrar Nuevo Pedido</span>
+            </h2>
+
+            <div id="feedback" class="hidden"></div>
+
+            <form id="pedidoForm" class="space-y-6">
+                <input type="hidden" id="pedidoId">
+
+                <!-- CLIENTE + DIRECCIÓN -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-medium text-bk-primary">Cliente</label>
+                        <select id="clienteId" required class="mt-1 w-full rounded-md border px-3 py-2">
+                            <option disabled>Cargando clientes...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-bk-primary">Dirección de Entrega (BK-033)</label>
+                        <input type="text" id="direccionEntrega" required 
+                            class="mt-1 w-full rounded-md border px-3 py-2">
+                    </div>
+                </div>
+
+                <!-- PRODUCTOS + MÉTODO DE PAGO -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <div>
+                        <label class="block text-sm font-medium text-bk-primary">Productos (BK-030)</label>
+                        <select id="productos" multiple required 
+                            class="mt-1 w-full rounded-md border px-3 py-2 h-40">
+                            <option disabled>Cargando productos...</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-bk-primary">Método de Pago</label>
+                        <select id="metodoPago" required 
+                            class="mt-1 w-full rounded-md border px-3 py-2">
+                            <option disabled selected>Seleccione método</option>
+                            <option value="EFECTIVO">Efectivo</option>
+                            <option value="DEBITO">Tarjeta Débito</option>
+                            <option value="CREDITO">Tarjeta Crédito</option>
+                        </select>
+
+                        <div id="bancoGroup" class="mt-4 hidden">
+                            <label class="block text-sm font-medium text-bk-primary">Banco (BK-022)</label>
+                            <input type="text" id="banco"
+                                class="mt-1 w-full rounded-md border px-3 py-2">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TOTAL -->
+                <div class="pt-4 border-t">
+                    <p class="text-xl">Subtotal: 
+                        <span id="subtotalDisplay" class="font-bold text-bk-accent">$0</span>
+                    </p>
+
+                    <p class="text-lg">Descuento (BK-021): 
+                        <span id="descuentoDisplay" class="font-bold text-red-500">0%</span>
+                    </p>
+
+                    <p class="text-2xl mt-2 text-bk-accent font-extrabold">
+                        TOTAL PEDIDO: <span id="totalDisplay">$0</span>
+                    </p>
+
+                    <p class="text-xs text-gray-500">
+                        Fecha: <span id="fechaPedido"></span>
+                    </p>
+                </div>
+
+                <div class="flex space-x-4 pt-4">
+                    <button id="submitBtn" type="submit"
+                        class="bg-bk-accent text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                        Registrar Pedido
+                    </button>
+
+                    <button id="resetBtn" type="button"
+                        class="hidden bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+                        Cancelar Edición
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- LISTADO -->
+        <h2 class="text-3xl font-bold text-bk-primary mb-6 border-b-2 border-bk-secondary">Pedidos Registrados</h2>
+
+        <div id="pedidoList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <p class="text-center text-gray-500" id="loadingMessage">Cargando pedidos...</p>
+        </div>
+
+    </main>
+
+    <script src="js/productos.js"></script>
+    <script src="js/clientes.js"></script>
+    <script src="js/pedidos.js"></script>
+
+</body>
+</html>

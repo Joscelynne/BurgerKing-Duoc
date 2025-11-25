@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes | BK-Duoc</title>
+    <!-- Configuración de Tailwind CSS con la paleta de colores BK -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bk-primary': '#B5121B', // Rojo principal de BK
+                        'bk-secondary': '#FCAC00', // Amarillo/Naranja de BK
+                        'bk-dark': '#292929', // Gris oscuro para texto/fondo
+                        'bk-light': '#F5F5F5', // Blanco roto para fondos
+                        'bk-accent': '#6EE7B7', // Verde menta para focus/éxito
+                    },
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'bk-glow': '0 0 15px rgba(181, 18, 27, 0.4)', // Sombra sutil con color primario
+                    }
+                },
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .input-bk {
+            transition: all 0.3s ease;
+        }
+        .input-bk:focus {
+            border-color: #6EE7B7; /* bk-accent */
+            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.5); /* Sombra de focus */
+        }
+        .bk-card-shadow {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out;
+        }
+        .bk-card-shadow:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+    
+</head>
+<body class="min-h-screen font-sans">
+
+    <header class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="logo">BK-DUOC</a>
+            <div class="nav-links">
+                <a href="productos.html">Productos</a>
+                <a href="combos.html">Combos</a>
+                <a href="pedidos.html">Pedidos</a>
+                <a href="clientes.html">Clientes</a>
+                <a href="empleados.html">Empleados</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <h1 class="text-3xl font-extrabold text-bk-dark mb-8 border-b-4 border-bk-secondary pb-2">Gestión de Clientes</h1>
+
+        <!-- Formulario de Creación/Edición -->
+        <div class="bg-white p-6 rounded-xl shadow-xl mb-10 border-t-4 border-bk-primary">
+            <h2 id="form-title" class="text-2xl font-semibold text-bk-dark mb-6">Nuevo Cliente</h2>
+            <form id="client-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- ID Oculto para Edición -->
+                <input type="hidden" id="client-id" value="">
+
+                <!-- Nombre -->
+                <div class="col-span-1">
+                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre (<span class="text-bk-primary">*</span>)</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Juan" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-nombre">BK-014: El nombre es obligatorio.</p>
+                </div>
+
+                <!-- Apellido -->
+                <div class="col-span-1">
+                    <label for="apellido" class="block text-sm font-medium text-gray-700 mb-1">Apellido (<span class="text-bk-primary">*</span>)</label>
+                    <input type="text" id="apellido" name="apellido" placeholder="Ej: Pérez" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-apellido">BK-015: El apellido es obligatorio.</p>
+                </div>
+
+                <!-- RUT -->
+                <div class="col-span-1">
+                    <label for="rut" class="block text-sm font-medium text-gray-700 mb-1">RUT (<span class="text-bk-primary">*</span>)</label>
+                    <input type="text" id="rut" name="rut" placeholder="Ej: 11.222.333-K" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-rut">BK-013: RUT inválido o duplicado.</p>
+                </div>
+
+                <!-- Correo -->
+                <div class="col-span-1">
+                    <label for="correo" class="block text-sm font-medium text-gray-700 mb-1">Email (<span class="text-bk-primary">*</span>)</label>
+                    <input type="email" id="correo" name="correo" placeholder="ejemplo@correo.cl" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-correo">BK-012: Email inválido o duplicado.</p>
+                </div>
+
+                <!-- Teléfono -->
+                <div class="col-span-1">
+                    <label for="telefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono (<span class="text-bk-primary">*</span>)</label>
+                    <input type="tel" id="telefono" name="telefono" placeholder="Ej: 912345678 (9 dígitos)" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-telefono">BK-016: Debe tener 9 dígitos numéricos.</p>
+                </div>
+
+                <!-- Dirección -->
+                <div class="col-span-1">
+                    <label for="direccion" class="block text-sm font-medium text-gray-700 mb-1">Dirección (<span class="text-bk-primary">*</span>)</label>
+                    <input type="text" id="direccion" name="direccion" placeholder="Ej: Av. Siempreviva 742" class="input-bk w-full px-4 py-2 border border-gray-300 rounded-lg shadow-inner focus:outline-none focus:ring-1">
+                    <p class="text-xs text-red-500 mt-1 hidden" id="error-direccion">BK-017: La dirección es obligatoria.</p>
+                </div>
+                
+                <!-- Estado (Activo/Inactivo) -->
+                <div class="col-span-1 flex items-center pt-5">
+                    <label for="activo" class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="activo" name="activo" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-bk-accent/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-bk-primary"></div>
+                        <span class="ml-3 text-sm font-medium text-gray-900" id="activo-label">Estado: Activo</span>
+                    </label>
+                </div>
+
+                <!-- Botones de Acción -->
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 flex justify-end space-x-4 mt-4">
+                    <button type="button" id="cancel-button" class="hidden px-6 py-2 bg-gray-500 text-white font-bold rounded-lg hover:bg-gray-600 transition duration-150 ease-in-out shadow-lg">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </button>
+                    <button type="submit" id="submit-button" class="px-6 py-2 bg-bk-primary text-white font-bold rounded-lg hover:bg-bk-secondary hover:text-bk-dark transition duration-150 ease-in-out shadow-lg shadow-bk-primary/50">
+                        <i class="fas fa-save mr-2"></i>Guardar Cliente
+                    </button>
+                </div>
+
+                <!-- Mensaje de Error/Éxito General -->
+                <div id="status-message" class="col-span-3 p-3 mt-4 hidden rounded-lg text-sm font-medium"></div>
+
+            </form>
+        </div>
+
+        <!-- Listado de Clientes -->
+        <h2 class="text-2xl font-semibold text-bk-dark mb-4">Listado de Clientes</h2>
+        <div id="clients-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Las cards de clientes se renderizarán aquí -->
+        </div>
+
+    </main>
+
+    <script src="clientes.js"></script>
+</body>
+</html>
