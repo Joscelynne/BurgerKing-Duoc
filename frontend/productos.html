@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos | BK-Duoc Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="logo">BK-DUOC</a>
+            <div class="nav-links">
+                <a href="productos.html">Productos</a>
+                <a href="combos.html">Combos</a>
+                <a href="pedidos.html">Pedidos</a>
+                <a href="clientes.html">Clientes</a>
+                <a href="empleados.html">Empleados</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero-section text-center py-10 bg-white rounded-xl shadow-lg mb-8">
+            <h1 class="text-4xl font-extrabold text-bk-accent mb-2">Gestión de Productos</h1>
+            <p class="text-lg text-gray-700">
+                Creación, edición y control de stock. ¡Aplicando reglas BK!
+            </p>
+        </section>
+
+        <!-- Formulario de Creación/Edición -->
+        <section class="form-card">
+            <h2><span id="formTitle">Crear Nuevo Producto</span></h2>
+            <div id="feedback" class="feedback-message" style="display: none;"></div>
+            
+            <form id="productForm">
+                <input type="hidden" id="productId">
+
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto (BK-002: Requerido)</label>
+                    <input type="text" id="nombre" required placeholder="Ej: Triple Whopper">
+                </div>
+
+                <div class="form-group">
+                    <!-- CAMBIO CLAVE: Precio Entero, min=1 y sin step -->
+                    <label for="precio">Precio Entero (BK-001: > 0)</label>
+                    <input type="number" id="precio" min="1" required placeholder="Ej: 5990">
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock">Stock (BK-005: ≥ 0)</label>
+                    <input type="number" id="stock" min="0" required placeholder="Ej: 150">
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría (BK-006: Válida)</label>
+                    <select id="categoria" required>
+                        <option value="" disabled selected>Seleccione una categoría</option>
+                        <option value="Hamburguesas">Hamburguesas</option>
+                        <option value="Bebidas">Bebidas</option>
+                        <option value="Acompañamientos">Acompañamientos</option>
+                        <option value="Postres">Postres</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción (BK-026: Máx 255 caracteres)</label>
+                    <textarea id="descripcion" maxlength="255" placeholder="Una descripción breve..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="imagenUrl">URL de Imagen (Opcional)</label>
+                    <input type="url" id="imagenUrl" placeholder="https://ejemplo.com/hamburguesa.jpg">
+                </div>
+                
+                <button type="submit" class="btn btn-primary" id="submitBtn">Crear Producto</button>
+                <button type="button" class="btn btn-secondary" id="resetBtn" style="display: none;">Cancelar Edición</button>
+            </form>
+        </section>
+
+        <!-- Listado de Productos en Cards -->
+        <h2>Productos Activos</h2>
+        <div id="productList" class="card-grid">
+            <!-- Las cards se inyectarán aquí desde productos.js -->
+        </div>
+    </main>
+
+    <script src="js/productos.js"></script>
+</body>
+</html>
