@@ -1,53 +1,61 @@
 package com.burgerking.duoc.db
 
 import com.burgerking.duoc.models.*
+import com.mongodb.MongoCommandException
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoCollection
-import com.mongodb.client.model.Filters
+import com.mongodb.client.model.IndexModel
 import com.mongodb.client.model.IndexOptions
-import com.mongodb.client.model.Indexes
+import org.bson.Document
 
-/**
- * Database Singleton usando Driver Sync (compatible con KMongo).
- * Conexión a Mongo Atlas + creación de índices únicos + logs personalizados.
- */
 object Database {
 
     private const val DB_NAME = "burgerking"
 
-    // URI original que tú estabas usando en tu código
     private const val ATLAS_URI =
         "mongodb+srv://joscelynne_db_user:cBY7FrIlIdH4xZKk@burgerking.s1qgce8.mongodb.net/?appName=BurgerKing"
 
-    // Cliente Sync compatible con KMongo
     lateinit var client: MongoClient
         private set
 
-    // Base de datos
     lateinit var db: com.mongodb.client.MongoDatabase
         private set
 
-    /**
-     * FUNCIÓN QUE TE FALTABA → ahora sí existe Database.connect()
-     */
+    // ----------------------------------
+    // SAFE INDEX (NUNCA CRASHEA)
+    // ----------------------------------
+    private fun <T> MongoCollection<T>.safeCreateIndex(model: IndexModel) {
+        try {
+            this.createIndexes(listOf(model))
+        } catch (e: MongoCommandException) {
+            if (e.errorCode == 86 || e.errorCode == 85) {
+                println("⚠️ Índice ignorado (ya existía con otra configuración): ${model.options?.name}")
+            } else {
+                throw e
+            }
+        }
+    }
+
+    // ----------------------------------
+    // CONEXIÓN
+    // ----------------------------------
     fun connect() {
 
-        println("🔌 Iniciando conexión a MongoDB Atlas…")
+        println("🔌 Conectando a MongoDB Atlas…")
 
         val connectionUri = System.getenv("MONGO_URI") ?: ATLAS_URI
 
         client = MongoClients.create(connectionUri)
         db = client.getDatabase(DB_NAME)
 
-        println(" Conectado correctamente a la base de datos '$DB_NAME'")
-        println(" URI usada: $connectionUri")
-
-        // Crear índices
-        ensureIndexes()
+        println("✔ Conexión establecida con '$DB_NAME'")
+        println("   Usando URI: $connectionUri")
     }
 
-    // Colecciones tipadas (se inicializan DESPUÉS de connect())
+    // ----------------------------------
+    // COLECCIONES
+    // ----------------------------------
     val productosCollection: MongoCollection<Producto> by lazy {
         db.getCollection("productos", Producto::class.java)
     }
@@ -68,53 +76,72 @@ object Database {
         db.getCollection("empleados", Empleado::class.java)
     }
 
-    /**
-     * Crear índices únicos según tus reglas BK.
-     */
+    // ----------------------------------
+    // CONSTANTE: índice único sólo si activo = true
+    // ----------------------------------
+    private val uniqueIfActive = IndexOptions()
+        .unique(true)
+        .partialFilterExpression(Document("activo", true))
+
+    // ----------------------------------
+    // ÍNDICES ÚNICOS
+    // ----------------------------------
     fun ensureIndexes() {
 
-        println("Creando / Verificando índices únicos en MongoDB…")
+        println("🔧 Creando/verificando índices únicos…")
 
-        val uniqueActive = IndexOptions()
-            .unique(true)
-            .partialFilterExpression(Filters.eq("activo", true))
+        // ---------------- PRODUCTOS ----------------
+        productosCollection.safeCreateIndex(
+            IndexModel(
+                Document("nombre", 1),
+                uniqueIfActive.name("producto_nombre_unico")
+            )
+        )
 
-        // PRODUCTOS
-        productosCollection.createIndex(
-            Indexes.ascending(Producto::nombre.name),
-            uniqueActive
+        // ---------------- CLIENTES ----------------
+        clientesCollection.safeCreateIndex(
+            IndexModel(
+                Document("rut", 1),
+                uniqueIfActive.name("cliente_rut_unico")
+            )
         )
-        println("   ✔ Índice Único 'nombre' en productos (activo = true) OK")
 
-        // CLIENTES
-        clientesCollection.createIndex(
-            Indexes.ascending(Cliente::rut.name),
-            uniqueActive
+        clientesCollection.safeCreateIndex(
+            IndexModel(
+                Document("correo", 1),
+                IndexOptions()
+                    .unique(true)
+                    .partialFilterExpression(Document("activo", true))
+                    .name("cliente_correo_unico")
+            )
         )
-        clientesCollection.createIndex(
-            Indexes.ascending(Cliente::correo.name),
-            uniqueActive
-        )
-        println("   ✔ Índices Únicos 'rut' y 'correo' en clientes OK")
 
-        // EMPLEADOS
-        empleadosCollection.createIndex(
-            Indexes.ascending(Empleado::rut.name),
-            uniqueActive
+        // ---------------- EMPLEADOS ----------------
+        empleadosCollection.safeCreateIndex(
+            IndexModel(
+                Document("rut", 1),
+                uniqueIfActive.name("empleado_rut_unico")
+            )
         )
-        empleadosCollection.createIndex(
-            Indexes.ascending(Empleado::correo.name),
-            uniqueActive
-        )
-        println("   ✔ Índices Únicos 'rut' y 'correo' en empleados OK")
 
-        // COMBOS
-        combosCollection.createIndex(
-            Indexes.ascending(Combo::nombre.name),
-            uniqueActive
+        empleadosCollection.safeCreateIndex(
+            IndexModel(
+                Document("correo", 1),
+                IndexOptions()
+                    .unique(true)
+                    .partialFilterExpression(Document("activo", true))
+                    .name("empleado_correo_unico")
+            )
         )
-        println("   ✔ Índice Único 'nombre' en combos OK")
 
-        println(" Todos los índices están configurados correctamente.")
+        // ---------------- COMBOS ----------------
+        combosCollection.safeCreateIndex(
+            IndexModel(
+                Document("nombre", 1),
+                uniqueIfActive.name("combo_nombre_unico")
+            )
+        )
+
+        println("✔ Índices listos sin conflictos ✨")
     }
 }

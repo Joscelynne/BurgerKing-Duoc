@@ -1,21 +1,41 @@
 package com.burgerking.duoc.routes
 
 import com.burgerking.duoc.controllers.ProductoController
-import com.burgerking.duoc.services.ProductoService
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
+import org.koin.ktor.ext.inject
 
-fun Application.configureProductoRoutes() {
-    val controller = ProductoController(ProductoService())
+fun Application.productoRoutes() {
+
+    val controller by inject<ProductoController>()
 
     routing {
         route("/api/productos") {
-            // CRUD Completo
-            get { controller.getAllProductos(call) } // Listar (Read)
-            post { controller.createProducto(call) } // Crear (Create)
-            get("/{id}") { controller.getProducto(call) } // Obtener por ID (Read)
-            put("/{id}") { controller.updateProducto(call) } // Actualizar (Update)
-            delete("/{id}") { controller.deleteProducto(call) } // Eliminar Lógico (Delete)
+
+            // GET /api/productos
+            get {
+                controller.getAllProductos(call)
+            }
+
+            // GET /api/productos/{id}
+            get("/{id}") {
+                controller.getProductoById(call)
+            }
+
+            // POST /api/productos
+            post {
+                controller.createProducto(call)
+            }
+
+            // PUT /api/productos/{id}
+            put("/{id}") {
+                controller.updateProducto(call)
+            }
+
+            // DELETE /api/productos/{id}
+            delete("/{id}") {
+                controller.softDeleteProducto(call)
+            }
         }
     }
 }

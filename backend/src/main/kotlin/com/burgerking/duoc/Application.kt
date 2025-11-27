@@ -18,6 +18,7 @@ import com.burgerking.duoc.modules.*
 fun main() {
     // 1) Conectar a Mongo Atlas ANTES de iniciar Ktor
     Database.connect()
+    Database.ensureIndexes()
 
     // 2) Iniciar servidor Ktor
     embeddedServer(
@@ -29,10 +30,12 @@ fun main() {
     }.start(wait = true)
 }
 
+
+
 fun Application.module() {
 
     // -------------------------------
-    // 1️⃣  KOIN (Inyección de dependencias)
+    // 1 KOIN (Inyección de dependencias)
     // -------------------------------
     install(Koin) {
         printLogger()
@@ -40,7 +43,7 @@ fun Application.module() {
     }
 
     // -------------------------------
-    // 2️⃣  CORS
+    // 2  CORS
     // -------------------------------
     install(CORS) {
         anyHost()
@@ -52,7 +55,7 @@ fun Application.module() {
     }
 
     // -------------------------------
-    // 3️⃣  JSON
+    // 3  JSON
     // -------------------------------
     install(ContentNegotiation) {
         gson {
@@ -62,15 +65,14 @@ fun Application.module() {
     }
 
     // -------------------------------
-    // 4️⃣  RUTAS API
+    // 4  RUTAS API
     // -------------------------------
-//    routing {
-//        productoRoutes()
-//        comboRoutes()
-//        clienteRoutes()
-//        empleadoRoutes()
-//        pedidoRoutes()
-//    } AGREGAR CUANDO ARREGLEMOS LAS RUTAS API!
-
+   routing {
+       comboRoutes()
+       empleadoRoutes()
+       pedidoRoutes()
+  }
+    productoRoutes()
+    clienteRoutes()
     println(" Servidor BurgerKing-Duoc iniciado en http://localhost:8080")
 }
